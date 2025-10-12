@@ -47,7 +47,8 @@ import pandas as pd
 ```{code-cell} ipython3
 # votre code
 df = pd.read_csv('data/objects-on-the-moon.csv')
-df 
+df.shape
+df.head(4)
 ```
 
 3. 1. vous remarquez une première colonne franchement inutile  
@@ -59,7 +60,7 @@ pd.DataFrame.drop?
 ```
 
 ```{code-cell} ipython3
-
+df.drop(columns=['Unnamed: 0'])
 ```
 
 4. 1. appelez la méthode `info` des dataframes (`non-null` signifie `non-nan` i.e. non manquant)
@@ -67,6 +68,8 @@ pd.DataFrame.drop?
 
 ```{code-cell} ipython3
 # votre code
+#df.describe()
+df.info() #colonne 7 entièrement vide 
 ```
 
 5. 1. utilisez la méthode `dropna` des dataframes pour supprimer *en place* les colonnes qui ont toutes leurs valeurs manquantes  
@@ -75,6 +78,8 @@ pd.DataFrame.drop?
 
 ```{code-cell} ipython3
 # votre code
+df.dropna(how='all', axis=1)
+#pd.DataFrame.dropna?
 ```
 
 6. 1. affichez la ligne d'`index` $88$, que remarquez-vous ?
@@ -84,6 +89,10 @@ pd.DataFrame.drop?
 
 ```{code-cell} ipython3
 # votre code
+#df.loc[88]
+ #la ligne est vide 
+df1=df.drop(columns=['Unnamed: 0'])
+df1.dropna(how='all', axis=0)
 ```
 
 7. 1. utilisez l'attribut `dtypes` des dataframes pour voir le type de vos colonnes
@@ -91,6 +100,7 @@ pd.DataFrame.drop?
 
 ```{code-cell} ipython3
 # votre code
+df1.dtypes #masses sont des objets 
 ```
 
 8. 1. utilisez la méthode `unique` des `Series`pour en regarder le contenu de la colonne des masses
@@ -98,6 +108,7 @@ pd.DataFrame.drop?
 
 ```{code-cell} ipython3
 # votre code
+df1['Mass (lb)'].unique()  #certaines sont indiquées en inferieur et superieur 
 ```
 
 9. 1. conservez la colonne `'Mass (lb)'` d'origine  
@@ -109,6 +120,10 @@ pd.DataFrame.drop?
 
 ```{code-cell} ipython3
 # votre code
+df1['Mass (lb) origin']=df1['Mass (lb)'].copy()
+#pd.to_numeric?
+df1['Mass (lb)']=pd.to_numeric(df1['Mass (lb)'], errors='coerce')
+df1['Mass (lb)'].isna().sum() #il y a 5 valeurs manquantes
 ```
 
 10. 1. cette solution ne vous satisfait pas, vous ne voulez perdre aucune valeur  
@@ -126,7 +141,18 @@ pd.DataFrame.drop?
      3. utilisez la méthode `astype` des `Series` pour la convertir finalement en `int`
 
 ```{code-cell} ipython3
-# votre code
+# votre cod
+df1=df.drop(columns=['Unnamed: 0']).copy()
+df2=df1.dropna(how='all', axis=0).copy()
+df2
+```
+
+```{code-cell} ipython3
+# votre cod
+df2['Mass (lb)']=df2['Mass (lb)'].str.replace(">","")
+df2['Mass (lb)']=df2['Mass (lb)'].str.replace("<","")
+df2['Mass (lb)'].unique()
+df2['Mass (lb)']=df2['Mass (lb)'].astype('int64')
 ```
 
 11. 1. sachant `1 kg = 2.205 lb`  
@@ -135,6 +161,8 @@ pd.DataFrame.drop?
 
 ```{code-cell} ipython3
 # votre code
+df2['Mass (kg)']=df2['Mass (lb)']/2.205
+df2['Mass (kg)']=df2['Mass (kg)'].astype('int64')
 ```
 
 12. 1. Quels sont les pays qui ont laissé des objets sur la lune ?
@@ -143,6 +171,17 @@ pd.DataFrame.drop?
 
 ```{code-cell} ipython3
 # votre code
+df2['Status'].unique()
+df3=df2[(df2['Status'] == 'Landed')]
+df3['Country'].unique()
+df3['Country'].value_counts()
+
+```
+
+```{code-cell} ipython3
+df2['Country'].value_counts().sum()
+
+(13/88,8/88)
 ```
 
 13. 1. quel est le poids total des objets sur la lune en kg ?
@@ -150,6 +189,9 @@ pd.DataFrame.drop?
 
 ```{code-cell} ipython3
 # votre code
+df2['Mass (lb)'].sum()
+df4=df2[df2['Country']=='United States']
+df4['Mass (lb)'].sum()
 ```
 
 14. 1. quel pays a laissé l'objet le plus léger ?  
@@ -162,6 +204,8 @@ voyez les méthodes `Series.idxmin()` et `Series.argmin()`
 
 ```{code-cell} ipython3
 # votre code
+df2['Mass (lb)'].idxmin()
+df.iloc[26]['Country']
 ```
 
 15. 1. y-a-t-il un Memorial sur la lune ?  
@@ -172,6 +216,7 @@ voyez les méthodes `Series.idxmin()` et `Series.argmin()`
 
 ```{code-cell} ipython3
 # votre code
+df2['Artificial object'].str=='Memorial' #non il y en a pas 
 ```
 
 16. 1. faites la liste Python des objets sur la lune  
@@ -179,6 +224,9 @@ voyez les méthodes `Series.idxmin()` et `Series.argmin()`
 
 ```{code-cell} ipython3
 # votre code
+
+df=pd.read_csv('data/objects-on-the-moon.csv')
+df['Artificial object'].tolist()
 ```
 
 ***
